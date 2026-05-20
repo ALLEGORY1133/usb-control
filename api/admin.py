@@ -11,7 +11,7 @@ class ClientPCAdmin(admin.ModelAdmin):
 
 @admin.register(USBDevice)
 class USBDeviceAdmin(admin.ModelAdmin):
-    list_display   = ('caption', 'pc', 'status', 'first_seen', 'last_seen')
+    list_display   = ('caption', 'pnp_id', 'pc', 'status', 'first_seen', 'last_seen')
     list_filter    = ('status', 'pc')
     search_fields  = ('caption', 'pnp_id')
     readonly_fields = ('pnp_id', 'first_seen', 'last_seen')
@@ -33,7 +33,7 @@ class USBDeviceAdmin(admin.ModelAdmin):
 
 @admin.register(USBLog)
 class USBLogAdmin(admin.ModelAdmin):
-    list_display  = ('usb_caption', 'pc', 'action', 'timestamp')
+    list_display  = ('usb_caption', 'pnp_id', 'pc', 'action', 'timestamp')
     list_filter   = ('pc',)
     search_fields = ('usb_caption', 'pnp_id')
     readonly_fields = ('pc', 'usb_caption', 'pnp_id', 'action', 'timestamp')
