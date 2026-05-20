@@ -10,10 +10,12 @@
     .\dev.ps1
     .\dev.ps1 -Port 8080
     .\dev.ps1 -NoBrowser
+    .\dev.ps1 -WithAgent
 #>
 param(
     [int]$Port = 8000,
-    [switch]$NoBrowser
+    [switch]$NoBrowser,
+    [switch]$WithAgent
 )
 
 Set-StrictMode -Version Latest
@@ -144,7 +146,40 @@ if (-not $hasStatic) {
     Write-OK "Static fayllar mavjud"
 }
 
-# 8. Ishga tushirish
+# 8. Agent (ixtiyoriy)
+if ($WithAgent) {
+    Write-Step "USB Agent tekshirilmoqda..."
+
+    $AgentReq = Join-Path $Root "agent_requirements.txt"
+    if (Test-Path $AgentReq) {
+        $AgentPipList = pip list --format=freeze 2>$null
+        $AgentMissing = Get-Content $AgentReq | Where-Object { $_ -match "\S" } | Where-Object {
+            $pkg = ($_ -split "==")[0].ToLower()
+            -not ($AgentPipList -match "(?i)^$pkg(==|$)")
+        }
+        if ($AgentMissing) {
+            Write-Warn "Agent paketlari o'rnatilmoqda..."
+            pip install -r agent_requirements.txt --quiet
+            Write-OK "Agent paketlari o'rnatildi"
+        } else {
+            Write-OK "Agent paketlari mavjud"
+        }
+    }
+
+    $AgentFile = Join-Path $Root "usb_agent.pyw"
+    if (-not (Test-Path $AgentFile)) {
+        Write-Warn "usb_agent.pyw topilmadi - o'tkazib yuborildi"
+    } else {
+        $pythonw = Join-Path $VenvDir "Scripts\pythonw.exe"
+        if (-not (Test-Path $pythonw)) {
+            $pythonw = "pythonw"
+        }
+        Start-Process $pythonw -ArgumentList "`"$AgentFile`"" -Verb RunAs
+        Write-OK "USB Agent ishga tushirildi (tray ikonkasini tekshiring)"
+    }
+}
+
+# 9. Ishga tushirish
 Write-Host ""
 Write-Host "  +------------------------------------------+" -ForegroundColor Green
 Write-Host "  |  Server ishga tushmoqda...               |" -ForegroundColor Green
