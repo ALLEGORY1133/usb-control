@@ -14,7 +14,6 @@ class USBDeviceAdmin(admin.ModelAdmin):
     list_display   = ('caption', 'pc', 'status', 'first_seen', 'last_seen')
     list_filter    = ('status', 'pc')
     search_fields  = ('caption', 'pnp_id')
-    list_editable  = ('status',)
     readonly_fields = ('pnp_id', 'first_seen', 'last_seen')
 
     actions = ['make_allowed', 'make_blocked', 'make_pending']
