@@ -55,11 +55,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+_db_url = os.getenv('DATABASE_URL', '')
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
+        default=_db_url or 'sqlite:///db.sqlite3',
         conn_max_age=600,
-        ssl_require=False,
+        ssl_require=_db_url.startswith('postgres'),
     )
 }
 
